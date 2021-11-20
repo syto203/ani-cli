@@ -275,8 +275,12 @@ open_episode () {
 		sed -E "
 			s/^${selection_id}\t[0-9]+/${selection_id}\t$((episode+1))/
 		" "$logfile" > "${logfile}.new" && mv "${logfile}.new" "$logfile"
-
-		setsid -f $player_fn --http-header-fields="Referer: $embedded_video_url" "$video_url" >/dev/null 2>&1
+		# added macOS support
+			if [[ "$(sw_vers | awk '/ProductName:/ {print$2}')" == "macOS"  ]]; then
+				$player_fn --http-header-fields="Referer: $embedded_video_url" "$video_url" >/dev/null 2>&1
+			else
+				setsid -f $player_fn --http-header-fields="Referer: $embedded_video_url" "$video_url" >/dev/null 2>&1
+			fi
 	else
 		printf "Downloading episode $episode ...\n"
 		printf "%s\n" "$video_url"
